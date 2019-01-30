@@ -8,6 +8,9 @@ topExpr: expr
     { System.out.println("result: "+ Integer.toString($expr.i));}
 ;
 
+comment:   LINE_COMMENT| BLOCK_COMMENT
+;
+
 expr returns [int i]:
       el=expr op='*' er=expr { $i=$el.i*$er.i; }
     | el=expr op='/' er=expr { $i=$el.i/$er.i; }
@@ -19,7 +22,8 @@ expr returns [int i]:
     ;
 
 VAR: 'var'; // keyword
-
+LINE_COMMENT: '#' ~( '\r' | '\n' )* -> channel(HIDDEN);
+BLOCK_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 ID: [_A-Za-z]+;
 INT: [0-9]+ ;
 WS : [ \t\r\n]+ -> skip ;
