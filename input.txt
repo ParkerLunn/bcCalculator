@@ -1,7 +1,12 @@
+<<<<<<< Updated upstream
 #/*#5+5;*/ 
+=======
+/* 5+5; 
+>>>>>>> Stashed changes
 var x = 5;
-10+/*2sadfsdfjlfaiujfidklnasikn+2*/2*3;
+10+2sadfsdfjlfaiujfidklnasikn+22*3;
 x;
+<<<<<<< Updated upstream
 f*2;
 s(3.1);
 c(3);
@@ -9,3 +14,12 @@ l(3);
 e(3);
 var x=3^2;
 x;
+=======
+f*2; */
+#1 && 1;
+0 || 1;
+250 <= 50;
+250 < 50;
+50 >= 250;
+50 > 250;
+>>>>>>> Stashed changes

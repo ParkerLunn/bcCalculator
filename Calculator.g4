@@ -12,8 +12,9 @@ comment:   LINE_COMMENT| BLOCK_COMMENT
 
 exprList: topExpr ( ';' topExpr)* ';'? ;
 
-topExpr: expr
-    { System.out.println("result: "+ Double.toString($expr.i));}
+topExpr:
+      boolExpr { System.out.println("result: "+ Integer.toString($boolExpr.b?1:0)); }
+    | expr { System.out.println("result: "+ Integer.toString($expr.i));}
 ;
 
 varDef: VAR ID '=' expr
@@ -22,14 +23,23 @@ varDef: VAR ID '=' expr
     }
 ;
 
-expr returns [double i]:
+boolExpr returns [boolean b]:
+      el=expr op='&&' er=expr { $b=($el.i!=0 && $er.i!=0); }
+    | el=expr op='||' er=expr { $b=($el.i!=0 || $er.i!=0); }
+    | el=expr op='>=' er=expr { $b=($el.i>=$er.i); }
+    | el=expr op='<=' er=expr { $b=($el.i<=$er.i); }
+    | el=expr op='>' er=expr { $b=($el.i>$er.i); }
+    | el=expr op='<' er=expr { $b=($el.i<$er.i); }
+    | el=expr op='=' er=expr { $b=($el.i==$er.i); }
+    | expr
+    ;
+
+expr returns [int i]:
       el=expr op='*' er=expr { $i=$el.i*$er.i; }
     | el=expr op='/' er=expr { $i=$el.i/$er.i; }
     | el=expr op='+' er=expr { $i=$el.i+$er.i; }
     | el=expr op='-' er=expr { $i=$el.i-$er.i; }
-    | el=expr op='^' er=expr { $i=Math.pow($el.i,$er.i);}
-    | INT                    { $i=Double.parseDouble($INT.text);}
-    | DOUBLE                 { $i=Double.parseDouble($DOUBLE.text);}
+    | INT                    { $i=Integer.parseInt($INT.text); }
     | ID                     { $i= (variables.get($ID.text)!=null)?variables.get($ID.text) :0;}
     | 's(' ex=expr ')'       { $i= Math.sin($ex.i);}  
     | 'c(' ex=expr ')'       { $i= Math.cos($ex.i);}     
