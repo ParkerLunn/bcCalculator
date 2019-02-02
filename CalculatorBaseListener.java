@@ -1,5 +1,9 @@
 // Generated from Calculator.g4 by ANTLR 4.7.2
 
+    import java.util.Map;
+    import java.util.HashMap;
+    
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -10,6 +14,18 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * of the available methods.
  */
 public class CalculatorBaseListener implements CalculatorListener {
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterComment(CalculatorParser.CommentContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComment(CalculatorParser.CommentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -27,6 +43,18 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTopExpr(CalculatorParser.TopExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTopExpr(CalculatorParser.TopExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVarDef(CalculatorParser.VarDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -39,13 +67,13 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTopExpr(CalculatorParser.TopExprContext ctx) { }
+	@Override public void enterBoolExpr(CalculatorParser.BoolExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTopExpr(CalculatorParser.TopExprContext ctx) { }
+	@Override public void exitBoolExpr(CalculatorParser.BoolExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
