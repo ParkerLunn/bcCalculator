@@ -13,33 +13,34 @@ comment:   LINE_COMMENT| BLOCK_COMMENT
 exprList: topExpr ( ';' topExpr)* ';'? ;
 
 topExpr:
-    expr { System.out.println("result: "+ Integer.toString($expr.i));}
     | boolExpr { System.out.println("result: "+ Integer.toString($boolExpr.b?1:0)); }
+    | expr { System.out.println("result: "+ Double.toString($expr.i));}
 ;
 
-varDef: VAR ID '=' expr
-    {
-    variables.put($ID.text, $expr.i);
-    }
+varDef: 
+        ID '=' expr {variables.put($ID.text, $expr.i);}
+    |   ID '=' boolExpr {variables.put($ID.text, $boolExpr.b?1.0:0.0);}
+
 ;
 
 boolExpr returns [boolean b]:
-      el=expr op='&&' er=expr { $b=($el.i!=0 && $er.i!=0); }
-    | el=expr op='||' er=expr { $b=($el.i!=0 || $er.i!=0); }
+      el=expr op='||' er=expr { $b=($el.i!=0 || $er.i!=0); }
+    | el=expr op='&&' er=expr { $b=($el.i!=0 && $er.i!=0); } 
+    | '!'boolExpr {$b=!$boolExpr.b;}
     | el=expr op='>=' er=expr { $b=($el.i>=$er.i); }
     | el=expr op='<=' er=expr { $b=($el.i<=$er.i); }
     | el=expr op='>' er=expr { $b=($el.i>$er.i); }
     | el=expr op='<' er=expr { $b=($el.i<$er.i); }
     | el=expr op='==' er=expr { $b=($el.i==$er.i); }
-    | expr
-    ;
+;
 
 expr returns [double i]:
-      el=expr op='*' er=expr { $i=$el.i*$er.i; }
+    | varDef  {$i=1;}
+    | '!'expr {$i=($expr.i==0)?1:0;}
+    | el=expr op='*' er=expr { $i=$el.i*$er.i; }
     | el=expr op='/' er=expr { $i=$el.i/$er.i; }
     | el=expr op='+' er=expr { $i=$el.i+$er.i; }
     | el=expr op='-' er=expr { $i=$el.i-$er.i; }
-    | el=expr op='^' er=expr { $i=Math.pow($el.i,$er.i); }
     | INT                    { $i=Double.parseDouble($INT.text); }
     | DOUBLE                 { $i=Double.parseDouble($DOUBLE.text); }
     | ID                     { $i= (variables.get($ID.text)!=null)?variables.get($ID.text) :0 ; }
@@ -47,13 +48,14 @@ expr returns [double i]:
     | 'c(' ex=expr ')'       { $i= Math.cos($ex.i);}     
     | 'l(' ex=expr ')'       { $i= Math.log($ex.i);}    
     | 'e(' ex=expr ')'       { $i= Math.exp($ex.i);}                  
-    | varDef
-    | '('expr')'
+    | el=expr op='^' er=expr { $i=Math.pow($er.i,$el.i); }
+    | expr'++' {$i=$expr.i+1;}
+    | expr'--' {$i=$expr.i-1;}
     ;
 
 VAR: 'var'; // keyword
 LINE_COMMENT: '#' ~( '\r' | '\n' )* -> channel(HIDDEN);
-BLOCK_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
+BLOCK_COMMENT: '/*' .* '*/' -> channel(HIDDEN);
 ID: [_A-Za-z]+;
 INT: [0-9]+ ;
 DOUBLE:[0-9]+'.'[0-9]+;
