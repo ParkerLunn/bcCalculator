@@ -35,22 +35,56 @@ boolExpr returns [boolean b]:
 ;
 
 expr returns [double i]:
+    | '('expr')'    {$i=$expr.i;}
+    | 'print('expr')' {System.out.println($expr.i);}
+    | 'sqrt('expr')' { $i=Math.sqrt($expr.i);}
+    | ID'++' { if(variables.get($ID.text)!=null){
+                 $i=variables.get($ID.text);
+                 variables.put($ID.text,$i+1);
+                 }
+               else
+                 $i=0;   
+             }
+    | ID'--' { if(variables.get($ID.text)!=null){
+                 $i=variables.get($ID.text);
+                 variables.put($ID.text,$i-1);
+                 }
+               else
+                 $i=0;   
+             }
+    | '++'ID { if(variables.get($ID.text)!=null){
+                 $i=variables.get($ID.text)+1;
+                 variables.put($ID.text,$i);
+                 }
+               else
+                 $i=0;   
+             }
+    |    '--'ID     { if(variables.get($ID.text)!=null){
+                        $i=variables.get($ID.text)-1;
+                        variables.put($ID.text,$i);
+                        }
+                    else
+                        $i=0;   
+                    }
     | varDef  {$i=1;}
-    | '!'expr {$i=($expr.i==0)?1:0;}
-    | el=expr op='*' er=expr { $i=$el.i*$er.i; }
-    | el=expr op='/' er=expr { $i=$el.i/$er.i; }
-    | el=expr op='+' er=expr { $i=$el.i+$er.i; }
-    | el=expr op='-' er=expr { $i=$el.i-$er.i; }
     | INT                    { $i=Double.parseDouble($INT.text); }
     | DOUBLE                 { $i=Double.parseDouble($DOUBLE.text); }
     | ID                     { $i= (variables.get($ID.text)!=null)?variables.get($ID.text) :0 ; }
+    | '!'expr {$i=($expr.i==0)?1:0;}
+    | el=expr op=('*'|'/') er=expr { if($op.text.equals("*"))
+                                        $i=$el.i*$er.i;
+                                     else{
+                                        if($er.i==0)
+                                            System.out.println("Divide by zero error");
+                                        else
+                                            $i=$el.i/$er.i; }
+                                     }
+    | el=expr op=('+'|'-') er=expr { $i=($op.text.equals("+"))?$el.i+$er.i:$el.i-$er.i;}
     | 's(' ex=expr ')'       { $i= Math.sin($ex.i);}  
     | 'c(' ex=expr ')'       { $i= Math.cos($ex.i);}     
     | 'l(' ex=expr ')'       { $i= Math.log($ex.i);}    
     | 'e(' ex=expr ')'       { $i= Math.exp($ex.i);}                  
-    | el=expr op='^' er=expr { $i=Math.pow($er.i,$el.i); }
-    | expr'++' {$i=$expr.i+1;}
-    | expr'--' {$i=$expr.i-1;}
+    | el=expr op='^' er=expr { $i=Math.pow($el.i,$er.i); }
     ;
 
 VAR: 'var'; // keyword
