@@ -2,9 +2,11 @@ grammar Calculator;
 @header{
     import java.util.Map;
     import java.util.HashMap;
+    import java.util.Scanner;
     }
 @members{ 
     public static Map<String, Double> variables = new HashMap<String, Double>(); 
+    public static Scanner in = new Scanner(System.in);
     }
 
 comment:   LINE_COMMENT| BLOCK_COMMENT
@@ -13,17 +15,21 @@ comment:   LINE_COMMENT| BLOCK_COMMENT
 exprList: topExpr ( ';' topExpr)* ';'? ;
 
 topExpr:
-    | boolExpr { System.out.println("result: "+ Integer.toString($boolExpr.b?1:0)); }
-    | expr { System.out.println("result: "+ Double.toString($expr.i));}
+    | boolExpr { if($boolExpr.s.equals("v")){}
+                 else
+                   System.out.println("result: "+ Integer.toString($boolExpr.b?1:0)); }
+    | expr { if($expr.s.equals("v")){} 
+             else 
+                System.out.println("result: "+ Double.toString($expr.i));}
 ;
 
-varDef: 
-        ID '=' expr {variables.put($ID.text, $expr.i);}
-    |   ID '=' boolExpr {variables.put($ID.text, $boolExpr.b?1.0:0.0);}
+varDef returns[double d]: 
+        ID '=' expr {variables.put($ID.text, $expr.i); $d=$expr.i;}
+    |   ID '=' boolExpr {variables.put($ID.text, $boolExpr.b?1.0:0.0); $d=$boolExpr.b?1.0:0.0;}
 
 ;
 
-boolExpr returns [boolean b]:
+boolExpr returns [boolean b, String s=""]:
       el=expr op='||' er=expr { $b=($el.i!=0 || $er.i!=0); }
     | el=expr op='&&' er=expr { $b=($el.i!=0 && $er.i!=0); } 
     | '!'boolExpr {$b=!$boolExpr.b;}
@@ -34,10 +40,12 @@ boolExpr returns [boolean b]:
     | el=expr op='==' er=expr { $b=($el.i==$er.i); }
 ;
 
-expr returns [double i]:
+expr returns [double i, String s=""]:
     | '('expr')'    {$i=$expr.i;}
     | 'print('expr')' {System.out.println($expr.i);}
     | 'sqrt('expr')' { $i=Math.sqrt($expr.i);}
+    | 'read()'       { $i = in.nextDouble();
+                       in.close();}
     | ID'++' { if(variables.get($ID.text)!=null){
                  $i=variables.get($ID.text);
                  variables.put($ID.text,$i+1);
@@ -66,7 +74,7 @@ expr returns [double i]:
                     else
                         $i=0;   
                     }
-    | varDef  {$i=1;}
+    | varDef  {$i=$varDef.d;$s="v";}
     | INT                    { $i=Double.parseDouble($INT.text); }
     | DOUBLE                 { $i=Double.parseDouble($DOUBLE.text); }
     | ID                     { $i= (variables.get($ID.text)!=null)?variables.get($ID.text) :0 ; }
