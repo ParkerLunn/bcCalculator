@@ -59,7 +59,7 @@ expr returns [double i]:
                else
                  $i=0;   
              }
-    |    '--'ID     { if(variables.get($ID.text)!=null){
+    |  '--'ID     { if(variables.get($ID.text)!=null){
                         $i=variables.get($ID.text)-1;
                         variables.put($ID.text,$i);
                         }
