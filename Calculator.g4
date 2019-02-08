@@ -17,16 +17,26 @@ exprList: topExpr ( ';' topExpr)* ';'? ;
 topExpr:
     | boolExpr { if($boolExpr.s.equals("v")){}
                  else
-                   System.out.println("result: "+ Integer.toString($boolExpr.b?1:0)); }
+                   System.out.println(Integer.toString($boolExpr.b?1:0)); }
     | expr { if($expr.s.equals("v")){} 
              else 
-                System.out.println("result: "+ Double.toString($expr.i));}
+                System.out.println(Double.toString($expr.i));}
+    | printList
+;
+
+printList:
+    'print' (pExpr){System.out.println($pExpr.s);}
+;
+
+pExpr returns[String s]:
+       expr',' pExpr {$s=Double.toString($expr.i)+$pExpr.s;}
+    |  expr';' {$s=Double.toString($expr.i);}
+
 ;
 
 varDef returns[double d]: 
         ID '=' expr {variables.put($ID.text, $expr.i); $d=$expr.i;}
     |   ID '=' boolExpr {variables.put($ID.text, $boolExpr.b?1.0:0.0); $d=$boolExpr.b?1.0:0.0;}
-
 ;
 
 boolExpr returns [boolean b, String s=""]:
@@ -88,6 +98,7 @@ expr returns [double i, String s=""]:
                                             $i=$el.i/$er.i; }
                                      }
     | el=expr op=('+'|'-') er=expr { $i=($op.text.equals("+"))?$el.i+$er.i:$el.i-$er.i;}
+    | el=expr op='%' er=expr {$i = $el.i%$er.i;}
     | 's(' ex=expr ')'       { $i= Math.sin($ex.i);}  
     | 'c(' ex=expr ')'       { $i= Math.cos($ex.i);}     
     | 'l(' ex=expr ')'       { $i= Math.log($ex.i);}    
